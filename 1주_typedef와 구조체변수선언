@@ -1,0 +1,19 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Data {
+int data1;
+int data2; }sData;
+
+typedef sData *pData;                //주의
+
+int main()
+{
+        pData d;
+        sData s={1,2};
+        d=&s;
+        printf(" %d %d" , d->data1, d->data2);
+        return 0;
+
+}
+
