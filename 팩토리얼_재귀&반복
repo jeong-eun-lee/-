@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+//반복문으로 팩토리얼 구현
+int fac_iter(int n)
+{
+    int k,X=1;
+    for(k=n; k>0; k--)
+        X=X*k;
+    return(X);
+}
+//재귀로 팩토리얼 
+int fac_recur(int n)
+{
+    if(n<=1)
+        return(1);
+    else
+        return n*fac_recur(n-1);
+}
+void main(){
+
+
+int a= fac_iter(6);
+int b= fac_recur(6);
+printf("%d, %d", a,b);
+
+
+return 0;
+}
