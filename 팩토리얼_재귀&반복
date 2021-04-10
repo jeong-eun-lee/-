@@ -1,29 +1,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//반복문으로 팩토리얼 구현
-int fac_iter(int n)
-{
-    int k,X=1;
-    for(k=n; k>0; k--)
-        X=X*k;
-    return(X);
-}
-//재귀로 팩토리얼 
-int fac_recur(int n)
-{
-    if(n<=1)
-        return(1);
-    else
-        return n*fac_recur(n-1);
-}
+// 재귀로 피보나치수열
+int fib_recur(int n) {
+    if(n==0)
+        return 0;
+    if(n==1)
+        return 1;
+    else {
+        return (fib_recur(n-1)+fib_recur(n-2));
+}}
+
+// 0 n=1일때부터 1 1 2 3 5 8 13 21
+
+
+//반복으로 피보나치
+int fib_ite(int n){
+    int temp, curr=1, last=0;
+    if(n<2)
+        return n;
+    else{
+        for(int k=2; k<=n; k++){
+            temp=curr;
+            curr+=last;
+            last=temp;
+        }
+    return curr;}}
+
 void main(){
+int a=fib_recur(4);
+int b=fib_ite(4);
+printf("%d, %d", a, b);
 
 
-int a= fac_iter(6);
-int b= fac_recur(6);
-printf("%d, %d", a,b);
-
-
-return 0;
-}
+return 0;}
