@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+//Generic Merge
+
+int merge(int *a, int m, int *b, int n, int *c)
+{
+    int i=0, j=0, k=0;
+
+    while(i<m && j<n) {
+        if(a[i]<b[j]) {
+            c[k]= a[i];
+        }
+        else if(a[i]=b[j]) {
+            c[k]= a[i]+b[j];
+        }
+        else {
+            c[k]= b[j];
+        }}
+    if (i<m) {
+    while (i<m) {
+      c[k]=a[i];
+      i++;
+      k++;
+    }}
+
+    else{
+     c[k]=b[j];
+     j++;
+     k++;
+    }
+    return *c;
+    }
+
+int main()
+{
+    return 0;
+}
