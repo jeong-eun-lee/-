@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_LIST_SIZE 100
+#include <error.h>
+
+typedef int element;
+typedef struct {
+    int list[MAX_LIST_SIZE];     //배열정의
+    int length;                 // 현재 배열에 저장된 항목들의 개수
+}ArrayListType;
+
+
+//리스트초기화
+void init(ArrayListType *L)
+{
+    L->length=0;
+}
+
+
+//리스트가 비어있으면 1 반환
+void is_empty(ArrayListType *L)
+{
+    if (L->length==0)
+        return 1;
+    else
+        return 0;
+}
+
+//리스트가 가득 차 있으면 1반환
+void is_full(ArrayListType *L)
+{
+    if (L->length==MAX_LIST_SIZE)
+        return 1;
+    else
+        return 0;
+}
+
+//add함수 ( position = 삽입하고자 하는 위치. item = 삽입하고자 하는 자료 )
+void add(ArrayListType *L, int position, element item)
+{
+    if((is_full(L)==0) && (position>=0) && (position <= L ->length))
+    {
+        int i;
+        for(i=(L->length-1); i>=position; i--)
+            L->list[i+1]=L->list[i];
+        L->list[position]= item;
+        L->length++;
+    }}
+
+
+
+//delete 함수 ( 삭제 위치를 검사. 삭취위치부터 맨끝까지의 자료를 한칸씩 앞으로 이동 )
+//position =삭제하고자하는위치. 반환값= 삭제되는 자료
+element delete(ArrayListType *L, int position)
+{
+    int i;
+    element item;
+
+    if (position<0 || position >= L->length)
+        perror("위치오류");
+    item= L->list[position];
+    for(i=position; i<(L->length-1); i++)
+        L->list[i]=L->list[i+1];
+    L->length--;
+    return item;
+}
+
+int main()
+{
+    int i, n;
+    return 0;
+}
