@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct size {
+char a[10];
+int b;
+int *pointer;
+};
+
+int main() {
+        int ppointer=10;
+        struct size a={"size", 55,&ppointer};
+        printf("%d\n", sizeof(a));
+        struct size b[5];
+
+
+//구조체 포인터. 구조체포인터를 선언해서 구조체 변수를 가리킨다.
+struct size *p;
+p=&a;
+printf("%s\n%d\n", a.a, a.b);
+printf("%s\n%d\n", (*p).a, (*p).b);
+printf("%s\n%d\n", p->a, p->b);
+
+
+//구조체의 멤버로 포인터변수를 선언하는 경우
+//int ppointer=10;
+printf("%d", *(a.pointer));
+
+
+
+
+return 0;}
