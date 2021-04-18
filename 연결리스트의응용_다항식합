@@ -33,8 +33,8 @@ void insert_node_last(ListHeader *plist, int coef, int expon)
     temp->expon = expon;
     temp->link = NULL;
 
-    printf("%d\n\n", temp->coef);
-    system("pause");
+   // printf("%d\n\n", temp->coef);
+   // system("pause");
 
     if(plist->tail == NULL)
         plist->head = plist->tail = temp;
@@ -56,7 +56,7 @@ void poly_add(ListHeader *plist1, ListHeader *plist2, ListHeader *plist3)
         {
             sum = a->coef + b->coef;
             if(sum != 0)
-                insert_node_last(plist3, sum, a->coef);
+             //   insert_node_last(plist3, sum, a->coef);
                 insert_node_last(plist3, sum, a->expon);
             a = plist1->head->link; // a = a->link
             b = plist2->head->link; // b = b->link
