@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+    
+struct simple {
+    int data1;
+    int data2;
+};
+struct simple* add(struct simple *pointer);
+
+int main(){
+
+struct simple ts1={1,2};
+struct simple ts2;
+
+ts2=*(add(&ts1));
+
+printf("%d %d\n", ts1.data1, ts1.data2);
+
+printf("%d %d\n", ts2.data1, ts2.data2);
+return 0;}
+
+struct simple* add(struct simple *pointer) {
+
+pointer->data1++;
+pointer->data2++;
+
+return pointer;
+}
+
+//char str[5]="abcd";
+//char *str="ADF";
