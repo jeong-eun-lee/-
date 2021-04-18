@@ -2,43 +2,11 @@
 #include <stdlib.h>
 
 typedef int element;
-
 typedef struct ListNode
 {
     element data;
     struct ListNode *link;
 } ListNode;
-
-typedef struct
-{
-    ListNode *head;
-    int length;
-} ListType;
-
-
-int is_empty(ListType *list)
-{
-    if(list->head == NULL)
-        return 1;
-    else
-        return 0;
-}
-
-int get_length(ListType *list)
-{
-    return list->length;
-}
-
-// 리스트 안에서 pos 위치의 노드를 반환한다
-ListNode *get_node_at(ListType *list, int pos)
-{
-    ListNode *tmp_node = list->head;
-    if(pos < 0)
-        return NULL;
-    for(int i = 0; i < pos; i++)
-        tmp_node = tmp_node->link;
-    return tmp_node;
-}
 
 // phead       : 헤드 포인터에 대한 포인터
 // p           : 삽입될 위치의 선행 노드를 가리키는 포인터, 이 노드 다음에 삽입된다.
@@ -62,34 +30,6 @@ void insert_node(ListNode **phead, ListNode *p, ListNode *new_node)
     }
 }
 
-// 주어진 위치에 데이터를 삽입한다
-void add(ListType *list, int position, element data)
-{
-    ListNode *p;
-    if((position >= 0) && (position <= list->length))
-    {
-        ListNode *node = (ListNode*)malloc(sizeof(ListNode));
-        if(node == NULL)
-//            error("메모리 할당에러");
-        node->data = data;
-        p = get_node_at(list, position-1);
-        insert_node(&(list->head), p, node);
-        list->length++;
-    }
-}
-
-// 리스트의 끝에 데이터를 삽입한다
-void add_last(ListType *list, element data)
-{
-    add(list, get_length(list), data);
-}
-
-// 리스트의 처음에 데이터를 삽입한다
-void add_first(ListType *list, element data)
-{
-    add(list, 0, data);
-}
-
 // phead       : 헤드 포인터에 대한 포인터
 // p           : 삭제될 노드의 선행 노드를 가리키는 포인터, 이 노드 다음이 삭제된다.
 // removed     : 삭제될 노드를 가리키는 포인터
@@ -97,74 +37,105 @@ void remove_node(ListNode **phead, ListNode *p, ListNode *removed)
 {
     if(p == NULL) // 연결 리스트의 첫 번째 노드를 삭제
         *phead = (*phead)->link;
-      //*phead = removed->link; 이렇게 해도 되겠지??
     else
         p->link = removed->link;
     free(removed);
 }
 
-// 주어진 위치의 데이터를 삭제한다
-void delete(ListType *list, int pos)
+// 방문 연산 코드
+void display(ListNode *head) // 반복 버전
 {
-    if(!is_empty(list) && (pos >= 0) && (pos < list->length))
+    ListNode *p = head;
+    while(p != NULL)
     {
-        ListNode *p = get_node_at(list, pos-1);
-        ListNode *removed = get_node_at(list, pos);
-        remove_node(&(list->head), p, removed);
-        list->length--;
-    }
-}
-
-// 위치 pos에 해당하는 데이터를 반환하는 연산
-element get_entry(ListType *list, int pos)
-{
-    ListNode *p;
-    if(pos >= list->length)
-//        error("위치 오류");
-    p = get_node_at(list, pos);
-    return p->data;
-}
-
-void clear(ListType *list, int pos)
-{
-    for(int i = 0; i < list->length; i++)
-        delete(list, i);
-}
-
-//버퍼의 내용을 출력한다
-void display(ListType *list)
-{
-    ListNode *node = list->head;
-    for(int i = 0; i < list->length; i++)
-    {
-        printf("%d", node->data);
-        node = node->link;
+        printf("%d->", p->data);
+        p = p->link;
     }
     printf("\n");
 }
+void display_recur(ListNode *head) // 순환 버전
+{
+    ListNode *p = head;
+    if(p != NULL)
+    {
+        printf("%d->", p->data);
+        display_recur(p->link);
+    }
+}
 
-// 데이터 값이 s인 노드를 찾는다
-int is_in_list(ListType *list, element item)
+// 탐색 연산 : 특정한 데이터 값을 갖는 노드를 찾는 연산
+ListNode *search(ListNode *head, int x)
+{
+    ListNode *p = head;
+    while(p != NULL)
+        if(p->data = x)
+            return p; // 탐색 성공, node를 가리키는 포인터 반환
+    return p; // 탐색 실패 시 NULL 반환
+}
+
+// 합병 연산 : 2개의 리스트를 합치는 연산
+ListNode *concat(ListNode *head1, ListNode *head2)
 {
     ListNode *p;
-    p = list->head;
+    if(head1 == NULL)
+        return head2;
+    else if(head2 == NULL)
+        return head1;
+    else
+    {
+        p = head1;
+        while(p->link != NULL)
+            p = p->link;
+        p->link = head2;
+        return head1;
+    }
+}
+
+// 역순 연산 : 리스트의 노드들을 역순으로 만드는 연산
+ListNode *reverse(ListNode *head)
+{
+    // 순회 포인터로 p, q, r을 사용
+    ListNode *p, *q, *r;
+    p = head; // p는 역순으로 만들 리스트
+    q = NULL; // q는 역순으로 만들 노드
     while(p != NULL)
     {
-        if(p->data == item)
-            break;
+        // r은 q, q는 p를 차례대로 따라간다.
+        r = q;
+        q = p;
         p = p->link;
+        // q의 링크 방향을 바꾼다.
+        q->link = r;
     }
-    if(p == NULL)
-        return 0;
-    else
-        return 1;
+    return q;
 }
-
 int main()
 {
-    printf("연결 리스트를 이용한 리스트의 ADT");
+    // 헤드포인터(head pointer) : 연결 리스트의 맨 처음 노드를 가리키는 포인터
+    // 노드의 생성 : 동적 메모리 생성 라이브러리 malloc 함수 이용
+    ListNode *p1;
+    p1 = (ListNode *)malloc(sizeof(ListNode));
+    p1->data = 10;
+    p1->link = NULL;
+
+    // 두 번째 노드 생성과 첫 번 노드와의 연결
+    ListNode *p2;
+    p2 = (ListNode *)malloc(sizeof(ListNode));
+    p2->data = 20;
+    p2->link = NULL;
+    p1->link = p2;
+
+    // 두 번째 노드 생성과 첫 번 노드와의 연결
+    ListNode *p3;
+    p3 = (ListNode *)malloc(sizeof(ListNode));
+    p3->data = 30;
+    p3->link = NULL;
+    p2->link = p3;
+
+// 여기다가 연습 많이 해보자
+
+    display_recur(p1);
+    ListNode *q = reverse(p1);
+    display_recur(q);
     return 0;
 }
-
-
-// Object-Oriented Programming
