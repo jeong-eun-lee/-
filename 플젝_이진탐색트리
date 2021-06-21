@@ -1,0 +1,351 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <memory.h>
+#include <math.h>
+#define CAL(a,b) (((a)>(b))?(a):(b));
+#define MAX 100
+
+////트리노드의 기본형식
+typedef struct TreeNode {
+    int data;
+    struct TreeNode *left, *right;
+}TreeNode;
+
+
+////큐의 형식 선언
+typedef struct queue
+{
+ TreeNode* Q[MAX];
+ int head,tail;
+}queue;
+
+void output();///////////////////////////////////////// output.txt를 만드는 함수
+
+void insertion(TreeNode **root, int data); // data를 이진탐색트리에 삽입하는 함수
+TreeNode *search(TreeNode *t, int data);   // data가 이진탐색트리에 존재하는지의 여부를 조사하는 함수
+void deletion(TreeNode **root, int data); // 원하는 data를 이진탐색트리에서 삭제하는 함수
+
+queue* createQueue(void); ////////////////// 큐를 만드는 함수
+void enqueue(struct queue *T,TreeNode* key); //enqueue해서 원하는 노드를 입력하는 함수
+TreeNode* dequeue(struct queue *T);//////////// dequeue해서 자료삭제하는 함수
+int height(TreeNode *node);//////////////////// 트리의 높이를 재는 함수
+void levelorder(TreeNode **node, char tmp, int data);// 위의 4가지 함수를 사용, output파일을 불러와 level순서대로 배열되도록 txt파일을 수정 후 읽어내는  함수
+
+
+////큐를 만든다
+queue* createQueue(void)
+{
+ struct queue *T;
+ T =(struct queue *)malloc(sizeof(struct queue));
+ T->head=NULL;
+ T->tail=NULL;
+ return T;
+}
+
+////큐에 원하는 트리노드의 포인터를 삽입한다
+void enqueue(struct queue *T,TreeNode* key){
+ if(T->tail >MAX && T->head==0){
+  printf("queue is full\n");
+  return;
+ }
+ T->Q[T->tail]=key;
+ (T->tail)++;
+}
+
+////큐에서 자료삭제한다.
+TreeNode* dequeue(struct queue *T)
+{
+ if(T->tail == T->head){
+  printf("queue is empty\n");
+  return 0;
+ }
+ return T->Q[T->head++];
+}
+
+////높이 측정 함수
+int height(TreeNode *node) {
+	int h = 0;
+
+
+////왼쪽에서 잰 높이 와 오른쪽에서 잰 높이 중 큰 것을 더한다 /////
+	if (node != NULL)
+		h = 1+ CAL(height(node->left), height(node->right)) ;
+
+	return h;
+}
+
+
+////output파일에서 level 순서대로 노드를 정렬해서 저장 후 txt파일을 읽는다.
+////emptynode를 만들어서 자손이 없을 때 0을 데이터로 갖는 노드를 둬서 0이 출력될 수 있게 함
+void levelorder(TreeNode **node, char tmp, int data) {
+
+	FILE* fp;
+	fp = fopen("output.txt", "a");//output.txt를 수정전용으로 열기
+
+	//////////////에러 처리 /////////////////
+	if (fp == NULL)
+		perror("File Open Error\n");
+	if (node == NULL)
+		return;
+
+    queue* T = createQueue();
+
+   TreeNode *emptynode = (TreeNode *)malloc(sizeof(TreeNode));
+   //data가 0인 빈 노드 생성(자손이 없어도 0을 data로 갖는 노드가 필요)
+
+   emptynode->data = 0;
+   emptynode->left = emptynode->right = NULL;
+
+
+   fprintf(fp, "%c%d : ", tmp, data);
+
+   enqueue(T, *node );
+
+   for (int i = 0; i < pow(2, height(*node)) - 1; i++) {   //포화이진트리의 node 개수만큼 반복
+      TreeNode* A= T->Q[i];
+      if (A->left)//왼쪽 자손의 존재 여부
+         enqueue(T, A->left);// 왼쪽 자손 enqueue
+
+      else
+        enqueue(T, emptynode);   //왼쪽 자손이 없을 때 대신 0을 data로 갖는 노드 enqueue
+      if (A->right)//오른쪽 자손의 존재 여부
+         enqueue(T,A->right);// 오른쪽 자손 enqueue
+      else
+         enqueue(T, emptynode);   //오른쪽 자손이 없을 때 대신 0을 data로 갖는 노드 enqueue
+      fprintf(fp, "%d, ", A->data);
+
+    dequeue(T);
+      }
+
+
+	fprintf(fp, "\n");
+	fclose(fp);//fp 파일 닫기
+
+}
+
+
+////output 파일을 만든다 /////
+void output() {
+
+   FILE* fp;
+   fp = fopen("output.txt", "w");//output.txt를 쓰기전용으로 열기
+
+   if (fp == NULL)
+      perror("File Open Error\n");
+
+   fclose(fp);// 파일 닫기
+}
+
+
+
+
+////이진트리에 원소를 삽입한다
+////탐색 수행하여 새로운 노드를 어디에 넣을지 정한다
+////이미 있는 data의 경우 left child 에 삽입
+void insertion(TreeNode **root, int data) {
+    TreeNode *p, *t, *n; // p= 부모노드, t= 현재의 위치, n= 새로 삽입할 노드
+    t=*root;
+    p=NULL;
+    while(t!=NULL) {
+        p=t;
+        if(data== t->data) {
+            t=p->left;
+            break;
+        }
+
+        else if(data < p->data)
+            t=p->left;
+        else
+            t=p->right;
+    }                        
+
+
+    n=(TreeNode*)malloc(sizeof(TreeNode));
+    if(n==NULL)
+        return; // 메모리 할당이 제대로 되지 않은 상황
+    n->data=data;
+    n->left=n->right=NULL;  //새로 추가되는 노드의 자식노드는 NULL로 비워둔다
+
+
+    if(p!=NULL) { // 부모노드에 연결하는 과정
+        if(data == p->data)
+        {
+            n->left = p->left;
+            p->left = n; }
+        else if(data < p->data)
+        {
+            p->left = n;
+        }
+        else
+        {
+            p->right = n;
+        }}
+    else
+        *root= n;
+}
+
+
+////data가 있는 지 탐색한다
+////재귀로 data를 찾는다.
+////찾으면 노드를 반환해야하므로 함수형을 TreeNode*로 설정
+TreeNode *search(TreeNode *t, int data) { //data가 존재하는지 판별한다
+    if(t==NULL) //트리가 비어있으면 data 없음
+        return NULL;
+    if(data == t->data) //data를 찾으면 해당하는 노드를 반환한다
+        return t;
+    else if (data < t->data)
+        return search(t->left, data);
+    else
+        return search(t->right, data);
+}
+
+
+////원하는 data를 삭제하는 함수
+////세가지 경우에 따라 각각 실행
+void deletion(TreeNode **root, int data) {
+    TreeNode *p, *child, *t;
+    p=NULL;
+    t=*root;           // data를 갖는 노드 t를 탐색, p는 t의 부모노드
+
+    //data를 갖는 노드 t를 탐색
+    while(t!=NULL && t->data!=data) {
+        p=t;
+        t=(data<t->data) ? t->left : t->right;
+    }
+
+    //탐색 후 t가 NULL이면 트리 안에 data 없음
+    if(t==NULL) {
+        printf("%d data isn't in the tree", data);
+        return;
+    }
+
+    //case1; 삭제하고자 하는 노드가 단말노드인 경우
+    else if ((t->left==NULL) && (t->right==NULL)) {
+        if (p != NULL) {   //부모노드가 있을 경우
+            if (p->left == t)
+            p->left = NULL;
+         else
+            p->right = NULL;
+      }
+      else   //트리에 노드가 하나밖에 없을 때
+         *root = NULL;
+   }
+
+   //case2; 삭제하고자 하는 노드에 자식노드가 1개 있는 경우
+    else if (t->left == NULL || t->right == NULL) {
+      child = (t->left != NULL) ? t->left : t->right;
+      if (p != NULL) {
+         if (p->left == t) //t의 자리에 child 배치
+            p->left = child;
+         else
+            p->right = child;
+      }
+      else   //트리에 노드가 하나인 경우
+         *root = NULL;
+   }
+
+   //case3; 삭제하고자 하는 노드에 자식노드가 2개인 경우
+   //이 경우, 마지막에 p->left는 빈 노드인것을 알기에 right에 대해서만 연산 실행
+    else {
+       TreeNode* next= t;
+        p=t;
+        t = t->right;
+        while(t->left != NULL)
+        {
+            p = t;
+            t = t->left;
+        }
+        next->data = t->data;
+        if(t->right == NULL)
+        {
+            if(p->left == t)
+                p->left = NULL;
+            if(p->right == t)
+                p->right = NULL;
+        }
+        else
+            p->left = t->right;
+
+    }
+   }
+
+
+
+int main(){
+///////////////이진트리 초기화/////////////////////////
+   TreeNode *root;
+   root = (TreeNode *)malloc(sizeof(TreeNode));
+   root = NULL;
+
+//////////////빈 텍스트 파일 생성/////////////////////
+   output();
+   FILE* ffile;
+   ffile = fopen("input.txt", "r");//input.txt를 읽기모드로 열기
+
+//////////////파일 열리지 않으면 에러처리 ////////////
+   if (ffile == NULL)
+      perror("File Open Error\n");
+
+
+
+   for(;;) {//input.txt의 명령을 하나씩 실행
+      int data = -1;
+      char tmp;
+      fscanf(ffile, "%c%d ", &tmp, &data);
+
+      //오류처리//
+      if (data == -1)
+         break;
+
+
+    //insertion
+      else if (tmp == 'i') {
+         insertion(&root, data);          // 이진트리에 data 삽입
+         levelorder(&root, tmp, data);    // 함수로 output.txt를 level 순서에 맞게 정렬하고 이를 읽는다.
+      }
+
+
+    ////search
+    ////함수로 존재여부를 따진 후 결과를 출력
+      else if (tmp == 's') {
+         FILE* fp;
+         fp = fopen("output.txt", "a");
+         if (fp == NULL)
+            perror("파일을 여는 과정에서 오류 발생\n");
+
+         if (search(root, data))
+            fprintf(fp, "s%d : Exist\n", data);
+
+         else
+            fprintf(fp, "s%d : Not Exist\n", data);
+
+         fclose(fp);
+      }
+
+    ////deletion
+    //search로 먼저 데이터가 있는지 확인한 후, 있다면 데이터를 삭제 후 levelorder함수로 결과 읽어낸다
+    //데이터가 없다면 NotExist 출력
+      else if (tmp == 'd') {
+         FILE* fp;
+         fp = fopen("output.txt", "a");
+
+         if (fp == NULL)
+            perror("파일을 여는 과정에서 오류 발생\n");
+
+         if (search(root, data)) {
+            deletion(&root, data);
+            levelorder(&root,tmp, data );
+         }
+         else
+            fprintf(fp, "d%d : Not Exist\n", data);
+         fclose(fp);
+      }
+   }
+
+
+   //파일 닫고, 메모리 해제
+   fclose(ffile);
+   free(root);
+}
+
